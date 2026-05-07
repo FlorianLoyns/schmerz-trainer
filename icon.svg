@@ -1,0 +1,16 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Schmerz-Trainer">
+  <!-- Teal-Hintergrund -->
+  <rect width="512" height="512" fill="#0d7377"/>
+
+  <!-- Gesichtskreis -->
+  <circle cx="256" cy="256" r="170" fill="white"/>
+
+  <!-- Augen — kleine geschlossene Bögen (gepresst, schmerzhaft) -->
+  <g stroke="#0d7377" stroke-width="14" stroke-linecap="round" fill="none">
+    <path d="M 184 220 Q 206 232 228 220"/>
+    <path d="M 284 220 Q 306 232 328 220"/>
+  </g>
+
+  <!-- Mund — traurig nach unten gebogen -->
+  <path d="M 196 332 Q 256 282 316 332" stroke="#0d7377" stroke-width="16" fill="none" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0d7377">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Schmerz-Trainer">
+<title>Schmerz-Trainer</title>
+<meta name="description" content="Schmerzskalen, OPQRST-Anamnese und WHO-Stufenschema interaktiv lernen — Lerntool für die Pflegeausbildung.">
+<link rel="manifest" href="manifest.json">
+<link rel="canonical" href="https://florianloyns.github.io/schmerz-trainer/">
+<meta name="robots" content="index,follow">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Schmerz-Trainer">
+<meta property="og:description" content="Schmerzskalen, OPQRST-Anamnese und WHO-Stufenschema interaktiv lernen — für die Pflegeausbildung.">
+<meta property="og:image" content="https://florianloyns.github.io/schmerz-trainer/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+:root {
+  --teal: #0d7377;
+  --teal-dark: #0a5c5f;
+  --teal-soft: #d6ecec;
+  --teal-light: #e6f3f3;
+  --bg: #f6f8f7;
+  --bg2: #eaf2f1;
+  --card: #ffffff;
+  --ink: #0b1818;
+  --body: #2d3d3d;
+  --muted: #6b7b7b;
+  --border: #e4eae9;
+  --green: #639922;
+  --green-soft: #EAF3DE;
+  --red: #d14a4a;
+  --red-soft: #fdebeb;
+  --warm: #d97706;
+  --warm-soft: #fef3c7;
+}
+@media (prefers-color-scheme: dark) {
+  html:not(.light) {
+    --bg: #0a1414; --bg2: #0f1c1c; --card: #14252a;
+    --ink: #eef2f1; --body: #b8c2c1; --muted: #7c8b8a; --border: #1f3030;
+    --teal-light: #1a3033; --teal-soft: #1e3d3f;
+    --green-soft: #1f3018; --red-soft: #3a1818; --warm-soft: #3a2812;
+  }
+}
+html.dark {
+  --bg: #0a1414; --bg2: #0f1c1c; --card: #14252a;
+  --ink: #eef2f1; --body: #b8c2c1; --muted: #7c8b8a; --border: #1f3030;
+  --teal-light: #1a3033; --teal-soft: #1e3d3f;
+  --green-soft: #1f3018; --red-soft: #3a1818; --warm-soft: #3a2812;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg); color: var(--body);
+  font-size: 15px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+button { font: inherit; color: inherit; }
+.app {
+  max-width: 720px; margin: 0 auto;
+  min-height: 100vh; min-height: 100dvh;
+  padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom);
+  display: flex; flex-direction: column; gap: 14px;
+}
+
+.icon-btn {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  display: grid; place-items: center;
+  color: var(--body); cursor: pointer; flex-shrink: 0;
+}
+
+.learn-card {
+  background: var(--teal-light);
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-size: 13px; line-height: 1.55;
+}
+.learn-card strong { color: var(--ink); font-weight: 600; }
+
+/* Modul-Tabs */
+.mod-tabs {
+  display: flex;
+  background: var(--bg2);
+  border-radius: 11px;
+  padding: 3px; gap: 2px;
+}
+.mod-tab {
+  flex: 1; padding: 12px 6px;
+  min-height: 50px;
+  border-radius: 8px; background: transparent; border: 0;
+  font-size: 13px; font-weight: 600; color: var(--muted);
+  cursor: pointer; transition: all .15s;
+  display: flex; flex-direction: column;
+  justify-content: center;
+  align-items: center; gap: 2px; line-height: 1.15;
+  -webkit-user-select: none; user-select: none;
+}
+.mod-tab small { font-size: 10px; font-weight: 500; opacity: .65; }
+.mod-tab.active {
+  background: var(--card); color: var(--ink);
+  box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 0 0 1px var(--border);
+}
+.mod-tab.active small { opacity: .8; }
+
+/* Top-Bar mit Titel + Mode-Dropdown + Theme-Toggle */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding-top: 24px;
+  margin-bottom: 18px;
+}
+.topbar-title h1 {
+  margin: 0;
+  font-size: 22px;
+  color: var(--ink);
+  letter-spacing: -.015em;
+  line-height: 1.1;
+}
+.topbar-title p {
+  margin: 5px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.3;
+}
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Mode-Dropdown (Lernen/Probieren/Test) */
+.mode-dropdown { position: relative; }
+.mode-trigger {
+  height: 44px;
+  border-radius: 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 0 12px 0 16px;
+  font-size: 13px; font-weight: 600;
+  color: var(--body);
+  cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  letter-spacing: -.01em;
+  transition: background .15s, color .15s;
+  -webkit-user-select: none; user-select: none;
+}
+.mode-trigger:hover { background: var(--bg2); color: var(--ink); }
+.mode-trigger svg { transition: transform .15s; opacity: .65; }
+.mode-dropdown.open .mode-trigger svg { transform: rotate(180deg); }
+.mode-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  padding: 4px;
+  min-width: 130px;
+  display: none;
+  z-index: 50;
+}
+.mode-dropdown.open .mode-menu { display: block; }
+.mode-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  padding: 9px 12px;
+  font-size: 13px; font-weight: 600;
+  color: var(--body);
+  border-radius: 6px;
+  cursor: pointer;
+  letter-spacing: -.01em;
+}
+.mode-menu button:hover { background: var(--bg2); }
+.mode-menu button.active {
+  background: var(--teal-light);
+  color: var(--teal-dark);
+}
+
+/* Allgemeine Card */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+/* Lern-Inhalte: Item-Cards */
+.item-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.item-card-head {
+  display: flex; align-items: baseline; gap: 10px;
+  margin-bottom: 6px; flex-wrap: wrap;
+}
+.item-card-name {
+  font-size: 16px; font-weight: 800;
+  color: var(--ink); letter-spacing: -.01em;
+}
+.item-card-tag {
+  font-size: 11px; font-weight: 600;
+  color: var(--teal-dark);
+  background: var(--teal-light);
+  padding: 2px 8px; border-radius: 999px;
+  letter-spacing: .02em;
+}
+.item-card-text {
+  font-size: 13px; line-height: 1.55; color: var(--body);
+  margin: 0;
+}
+.item-card-text strong { color: var(--ink); font-weight: 600; }
+.item-card-source {
+  margin: 8px 0 0;
+  font-size: 11px; line-height: 1.45;
+  color: var(--muted);
+  font-style: italic;
+}
+.item-card-note {
+  margin: 8px 0 0;
+  background: var(--warm-soft);
+  border-left: 3px solid var(--warm);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px; line-height: 1.45;
+  color: var(--body);
+  font-style: normal;
+}
+.item-card-note strong { color: var(--ink); font-weight: 700; }
+.items-list {
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+/* Quiz-Bereich */
+.quiz-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 20px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.quiz-meta {
+  display: flex; align-items: center;
+  gap: 10px; font-size: 13px; color: var(--muted);
+  flex-wrap: wrap;
+}
+.quiz-meta strong { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+.quiz-points { margin-left: auto; }
+.quiz-bar {
+  height: 6px; background: var(--bg2);
+  border-radius: 999px; overflow: hidden; margin-top: 8px;
+}
+.quiz-fill {
+  height: 100%; background: var(--teal);
+  border-radius: 999px; transition: width .3s ease;
+}
+.quiz-text {
+  font-size: 16px; line-height: 1.55;
+  color: var(--ink); margin: 0;
+}
+.quiz-text strong { font-weight: 700; }
+.quiz-text em { color: var(--teal-dark); font-style: italic; font-weight: 600; }
+.quiz-question {
+  font-size: 13px; color: var(--muted);
+  font-style: italic; margin: -4px 0 0;
+}
+
+/* === Probieren-Modus: interaktive Skalen === */
+.try-zone {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+}
+.try-prompt {
+  margin: 0 0 8px;
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  font-weight: 700;
+}
+/* NRS */
+.nrs-row { display: grid; grid-template-columns: repeat(11, 1fr); gap: 3px; }
+.nrs-btn {
+  border: 0; border-radius: 6px;
+  padding: 12px 0;
+  font-size: 13px; font-weight: 700; color: var(--ink);
+  cursor: pointer; transition: transform .1s;
+}
+.nrs-btn:active { transform: scale(.94); }
+.nrs-btn.selected { outline: 3px solid var(--teal-dark); outline-offset: 1px; }
+.nrs-labels {
+  display: flex; justify-content: space-between;
+  font-size: 10px; color: var(--muted);
+  margin: 4px 2px 0;
+}
+/* VAS */
+.vas-line {
+  position: relative; height: 6px;
+  background: linear-gradient(to right, #cfeac0, #ffe5a0, #f8b7b7);
+  border-radius: 3px;
+  margin: 22px 8px 6px;
+}
+.vas-thumb {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 26px; height: 26px;
+  background: var(--card);
+  border: 3px solid var(--teal-dark);
+  border-radius: 50%;
+  cursor: grab; touch-action: none;
+  box-shadow: 0 2px 5px rgba(0,0,0,.18);
+}
+.vas-thumb:active { cursor: grabbing; }
+.vas-labels {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: var(--body); font-weight: 600;
+  margin: 0 4px;
+}
+/* VRS */
+.vrs-stack { display: flex; flex-direction: column; gap: 5px; }
+.vrs-btn {
+  background: var(--bg2); border: 2px solid transparent;
+  border-radius: 10px; padding: 11px 14px;
+  font-size: 14px; font-weight: 700; color: var(--ink);
+  cursor: pointer; text-align: left;
+  display: flex; justify-content: space-between; align-items: center;
+  transition: all .15s;
+}
+.vrs-btn:active { transform: scale(.98); }
+.vrs-btn.selected { background: var(--teal); color: white; border-color: var(--teal-dark); }
+.vrs-equiv { font-size: 11px; font-weight: 600; color: var(--muted); }
+.vrs-btn.selected .vrs-equiv { color: rgba(255,255,255,.85); }
+/* Smiley */
+.smiley-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-bottom: 4px; }
+.smiley-btn {
+  background: transparent; border: 2px solid transparent;
+  border-radius: 12px; padding: 4px 2px;
+  cursor: pointer; transition: all .15s;
+}
+.smiley-btn:active { transform: scale(.94); }
+.smiley-btn.selected { background: var(--teal-light); border-color: var(--teal); }
+.smiley-btn svg { width: 100%; height: auto; max-width: 50px; display: block; margin: 0 auto; }
+/* BESD/KUSS */
+.score-item { border-bottom: 1px solid var(--border); padding: 10px 0; }
+.score-item:last-of-type { border-bottom: 0; }
+.score-item h4 { margin: 0 0 6px; font-size: 13px; font-weight: 700; color: var(--ink); }
+.score-options { display: flex; flex-direction: column; gap: 4px; }
+.score-opt {
+  background: var(--bg2); border: 2px solid transparent;
+  border-radius: 8px; padding: 8px 10px;
+  cursor: pointer; display: flex; align-items: flex-start; gap: 8px;
+  transition: all .15s;
+}
+.score-opt:active { transform: scale(.99); }
+.score-opt.selected { background: var(--teal-light); border-color: var(--teal); }
+.score-opt .pts {
+  flex: 0 0 22px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 5px;
+  font-weight: 800; font-size: 12px; text-align: center;
+  padding: 3px 0; color: var(--ink);
+}
+.score-opt.selected .pts { background: var(--teal); color: white; border-color: var(--teal-dark); }
+.score-opt .label { font-size: 12px; line-height: 1.4; color: var(--body); }
+/* Live-Result innerhalb einer Skala */
+.result-mini {
+  margin-top: 12px;
+  background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+  color: white;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px; line-height: 1.4;
+}
+.result-mini .rm-num { font-weight: 800; font-size: 16px; }
+.result-mini .rm-text { opacity: .92; margin-top: 2px; display: block; }
+.try-reset {
+  margin-top: 8px;
+  background: transparent; border: 1px solid var(--border);
+  border-radius: 8px; padding: 7px 10px;
+  color: var(--muted); font-size: 12px; font-weight: 600;
+  cursor: pointer; width: 100%;
+}
+.try-reset:hover { background: var(--bg2); color: var(--body); }
+
+/* Auswerten-Button (Ergebnis erst auf Klick) */
+.try-reveal {
+  margin-top: 12px;
+  background: var(--teal); color: white; border: 0;
+  border-radius: 12px; padding: 14px 16px;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  width: 100%;
+  letter-spacing: -.01em;
+  transition: background .15s, opacity .15s;
+}
+.try-reveal:hover { background: var(--teal-dark); }
+.try-reveal:disabled {
+  background: var(--bg2); color: var(--muted);
+  cursor: not-allowed;
+}
+
+/* === Größere Touch-Targets im Probieren-Modus (Bedside-tauglich) === */
+.item-card[data-try] { padding: 16px 14px; }
+.item-card[data-try] .item-card-name { font-size: 17px; }
+.item-card[data-try] .try-zone {
+  margin-top: 14px;
+  padding-top: 14px;
+}
+.item-card[data-try] .nrs-btn { padding: 18px 0; font-size: 15px; border-radius: 8px; }
+.item-card[data-try] .nrs-labels { font-size: 11px; margin: 6px 4px 0; }
+.item-card[data-try] .smiley-btn svg { max-width: 80px; }
+.item-card[data-try] .smiley-btn { padding: 8px 4px; }
+.item-card[data-try] .vrs-btn {
+  padding: 16px 18px; font-size: 16px;
+  border-radius: 12px;
+}
+.item-card[data-try] .vrs-equiv { font-size: 12px; }
+.item-card[data-try] .vas-line { height: 8px; margin: 28px 12px 8px; }
+.item-card[data-try] .vas-thumb { width: 32px; height: 32px; }
+.item-card[data-try] .vas-labels { font-size: 13px; }
+.item-card[data-try] .score-item { padding: 14px 0; }
+.item-card[data-try] .score-item h4 { font-size: 14px; margin-bottom: 8px; }
+.item-card[data-try] .score-opt { padding: 12px 14px; gap: 10px; border-radius: 10px; }
+.item-card[data-try] .score-opt .pts { flex: 0 0 28px; padding: 6px 0; font-size: 14px; }
+.item-card[data-try] .score-opt .label { font-size: 14px; }
+.item-card[data-try] .result-mini {
+  padding: 16px 18px; font-size: 15px;
+  border-radius: 12px;
+}
+.item-card[data-try] .result-mini .rm-num { font-size: 20px; }
+.item-card[data-try] .try-prompt { font-size: 12px; }
+
+/* Quiz-Antwortbuttons (variiert je Modul) */
+.options {
+  display: grid; gap: 8px;
+  grid-template-columns: 1fr 1fr;
+}
+.options.three { grid-template-columns: 1fr 1fr 1fr; }
+.options.six { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 480px) {
+  .options { grid-template-columns: 1fr; }
+  .options.six { grid-template-columns: 1fr 1fr; }
+  .options.three { grid-template-columns: 1fr; }
+}
+.opt-btn {
+  background: var(--bg2);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer; text-align: left;
+  display: flex; align-items: center; gap: 8px;
+  transition: all .15s;
+  -webkit-user-select: none; user-select: none;
+  min-width: 0;
+}
+.opt-abbr {
+  flex-shrink: 0;
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  background: var(--card); color: var(--ink);
+  font-weight: 800; font-size: 12px;
+  display: grid; place-items: center;
+  border: 1px solid var(--border);
+  letter-spacing: -.02em;
+}
+.opt-name {
+  font-size: 13px; font-weight: 600;
+  color: var(--body); line-height: 1.25;
+  min-width: 0; flex: 1;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+@media (max-width: 380px) {
+  .opt-name { font-size: 12px; }
+  .opt-abbr { width: 30px; height: 30px; font-size: 11px; }
+  .opt-btn { padding: 9px 10px; gap: 7px; }
+}
+.opt-btn.active {
+  background: var(--teal); border-color: var(--teal);
+  box-shadow: 0 4px 12px rgba(13,115,119,.22);
+}
+.opt-btn.active .opt-abbr {
+  background: white; color: var(--teal-dark); border-color: white;
+}
+.opt-btn.active .opt-name { color: white; }
+.opt-btn.correct {
+  background: var(--green-soft); border-color: var(--green);
+}
+.opt-btn.correct .opt-abbr { background: var(--green); color: white; border-color: var(--green); }
+.opt-btn.correct .opt-name { color: var(--ink); font-weight: 700; }
+.opt-btn.wrong {
+  background: var(--red-soft); border-color: var(--red);
+}
+.opt-btn.wrong .opt-abbr { background: var(--red); color: white; border-color: var(--red); }
+.opt-btn.wrong .opt-name { color: var(--ink); }
+.opt-btn.also-correct {
+  background: var(--green-soft); border-color: var(--green);
+  opacity: .65;
+}
+.opt-btn.also-correct .opt-abbr { background: var(--green); color: white; border-color: var(--green); }
+
+.submit-btn {
+  background: var(--teal); color: white; border: 0;
+  border-radius: 12px; padding: 14px 18px;
+  font-size: 15px; font-weight: 700; cursor: pointer;
+  letter-spacing: -.01em; transition: all .15s; width: 100%;
+}
+.submit-btn:hover { background: var(--teal-dark); }
+.submit-btn:disabled { background: var(--bg2); color: var(--muted); cursor: not-allowed; }
+
+.quiz-feedback {
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+  font-size: 14px; line-height: 1.55;
+  color: var(--body);
+}
+.quiz-feedback strong { color: var(--ink); font-weight: 600; }
+
+/* End-Karte */
+.end-card {
+  background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+  color: white;
+  border-radius: 18px;
+  padding: 22px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(13,115,119,.25);
+}
+.end-score {
+  font-size: 48px; font-weight: 800;
+  letter-spacing: -.03em; line-height: 1;
+  margin-bottom: 4px;
+}
+.end-score-label { font-size: 13px; opacity: .85; margin-bottom: 18px; }
+.end-rating { font-size: 16px; font-weight: 700; margin-bottom: 18px; }
+.end-restart {
+  background: white; color: var(--teal-dark); border: 0;
+  border-radius: 12px; padding: 12px 22px;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+}
+
+/* Praxis-Hinweis */
+.note-card {
+  background: var(--teal-light);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.note-icon {
+  flex-shrink: 0;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--teal); color: white;
+  display: grid; place-items: center;
+  font-weight: 800; font-style: italic;
+  font-family: "Iowan Old Style", "Palatino", Georgia, serif;
+  font-size: 15px;
+}
+.note-body { font-size: 13px; line-height: 1.55; }
+.note-body strong { color: var(--ink); font-weight: 600; }
+
+.footer {
+  text-align: center; font-size: 11px; color: var(--muted);
+  padding: 4px 0 14px; letter-spacing: .02em; line-height: 1.7;
+}
+.footer a {
+  color: var(--muted);
+  text-decoration: underline;
+  text-decoration-color: rgba(107,123,123,.4);
+  text-underline-offset: 2px;
+  transition: color .15s, text-decoration-color .15s;
+}
+.footer a:hover {
+  color: var(--teal-dark);
+  text-decoration-color: var(--teal-dark);
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="topbar-title">
+      <h1>Schmerz-Trainer</h1>
+      <p>Skalen · Anamnese · WHO-Stufenschema</p>
+    </div>
+    <div class="topbar-actions">
+      <div class="mode-dropdown" id="mode-dropdown">
+        <button class="mode-trigger" id="mode-trigger" type="button" aria-haspopup="menu" aria-expanded="false">
+          <span id="mode-label">Lernen</span>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="mode-menu" id="mode-menu" role="menu">
+          <button class="active" data-mode="learn" type="button" role="menuitem">Lernen</button>
+          <button data-mode="try" type="button" data-only="skalen" role="menuitem">Probieren</button>
+          <button data-mode="test" type="button" role="menuitem">Test</button>
+        </div>
+      </div>
+      <button class="icon-btn" id="theme-btn" aria-label="Farbschema umschalten">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="mod-tabs" id="mod-tabs" role="tablist">
+    <button class="mod-tab active" data-m="skalen" role="tab">Skalen<small>welche für wen?</small></button>
+    <button class="mod-tab" data-m="anamnese" role="tab">Anamnese<small>OPQRST</small></button>
+    <button class="mod-tab" data-m="therapie" role="tab">Therapie<small>WHO-Stufen</small></button>
+  </div>
+
+  <div id="content"></div>
+
+  <div class="note-card">
+    <div class="note-icon">i</div>
+    <div class="note-body">
+      <strong>Lehr-Tool, kein klinischer Ersatz.</strong> Die Skalen-, Anamnese- und Therapie-Inhalte sind didaktisch vereinfacht — im Klinikalltag gelten der Hausstandard, die ärztliche Anordnung und individuelle Patientenfaktoren. Die Bewertungsbögen BESD und KUSS werden hier zur Veranschaulichung wiedergegeben (Quellen pro Skala im Lern-Modus); <strong>für die offizielle Pflegedokumentation am Patientenbett bitte den Originalbogen der Klinik verwenden</strong>.
+    </div>
+  </div>
+
+  <div class="footer">
+    <a href="https://florianloyns.github.io/Impressum/">Impressum</a>
+    &nbsp;·&nbsp;
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.de" rel="license">CC BY-NC-SA 4.0</a>
+  </div>
+
+</div>
+
+<script>
+// PWA: Service Worker registrieren
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+
+(function() {
+  const $ = id => document.getElementById(id);
+
+  try {
+    const saved = localStorage.getItem('theme');
+    if (saved) document.documentElement.classList.add(saved);
+  } catch(e){}
+  $('theme-btn').addEventListener('click', () => {
+    const html = document.documentElement;
+    const isDark = html.classList.contains('dark') ||
+                   (!html.classList.contains('light') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    html.classList.remove('dark', 'light');
+    html.classList.add(isDark ? 'light' : 'dark');
+    try { localStorage.setItem('theme', isDark ? 'light' : 'dark'); } catch(e){}
+  });
+
+  // ===== Daten =====
+
+  // Modul 1: SKALEN
+  const SKALEN_INFO = [
+    { abbr: 'NRS', short: 'Numerische Skala', name: 'Numerische Rating-Skala',
+      tag: 'orientierte Erwachsene',
+      text: 'Skala von <strong>0 (kein Schmerz)</strong> bis <strong>10 (stärkster vorstellbarer Schmerz)</strong>. Patient*in nennt eine Zahl. Standard für orientierte Erwachsene mit Zahlenverständnis. Schnell, gut für Verlaufsdokumentation.' },
+    { abbr: 'VAS', short: 'Visuelle Analogskala', name: 'Visuelle Analogskala',
+      tag: 'sprachunabhängig, Erwachsene',
+      text: 'Eine 10 cm lange Linie von „kein Schmerz" bis „stärkster vorstellbarer Schmerz". Patient*in markiert mit einem Schieber. Ideal bei Sprachbarrieren oder wenn Zahlen schwerfallen.',
+      source: 'Huskisson EC. <em>Measurement of pain.</em> Lancet. 1974;2(7889):1127–1131.' },
+    { abbr: 'VRS', short: 'Verbale Skala', name: 'Verbale Rating-Skala',
+      tag: 'kognitiv leicht eingeschränkt',
+      text: 'Wortbasierte Stufen: <strong>kein / leicht / mittel / stark / unerträglich</strong>. Patient*in wählt das passende Wort. Geeignet für ältere Menschen oder leichte kognitive Einschränkungen.',
+      note: '<strong>Achtung — Begriffsverwirrung:</strong> In manchen Lehrbüchern und Artikeln wird die VRS fälschlich wie die NRS beschrieben („auf einer Skala von 0–10…"). Das ist methodisch falsch: VRS arbeitet mit <strong>Wörtern</strong>, NRS mit <strong>Zahlen</strong>. Wenn dir das in einer Quelle begegnet, ist es ein Fehler in der Quelle.' },
+    { abbr: 'FPS', short: 'Smiley / Faces', name: 'Gesichterskala nach Hicks (FPS-R)',
+      tag: 'Kinder ab 4, Demenz',
+      text: 'Sechs Gesichter von lächelnd bis weinend, mit den Werten 0/2/4/6/8/10. Kind zeigt auf das Gesicht, das den Schmerz beschreibt. Validiert ab <strong>ca. 4 Jahren</strong> (Hicks 2001). Werte ab 4 gelten als Hinweis auf <strong>mittelstarken bis starken Schmerz</strong> — eine harte Therapieschwelle wie bei der KUSS gibt es hier nicht, die Therapieentscheidung erfolgt klinisch im Kontext. Wichtig: nicht „glücklich/traurig" fragen, sondern nach <strong>Schmerz</strong>.',
+      source: 'Hicks CL et al. <em>The Faces Pain Scale–Revised: toward a common metric in pediatric pain measurement.</em> Pain. 2001;93(2):173–183.' },
+    { abbr: 'BESD', short: 'Schmerz b. Demenz', name: 'Beurteilung Schmerzen bei Demenz',
+      tag: 'fortgeschrittene Demenz, Aphasie',
+      text: 'Fremdbeobachtungs-Skala — bewertet Atmung, Lautäußerungen, Mimik, Körpersprache und Reaktion auf Trost. Für Patient*innen, die <strong>nicht mehr verbal kommunizieren</strong> können (fortgeschrittene Demenz, schwere Aphasie).',
+      source: 'Basler HD, Hüger D, Kunz R, Luckmann J, Lukas A, Nikolaus T, Schuler MS. <em>Beurteilung von Schmerzen bei Demenz (BESD).</em> Schmerz. 2006;20(6):519–526. — Wiedergabe im Probieren-Modus zu didaktischen Zwecken; für die Pflegedokumentation den Originalbogen verwenden.' },
+    { abbr: 'KUSS', short: 'Säuglinge / Kleinkinder', name: 'Schmerzskala nach Büttner (KUSS)',
+      tag: 'Säuglinge, Kleinkinder, mehrfachbehindert',
+      text: 'Beobachtungsskala für <strong>Säuglinge und Kleinkinder bis 4 Jahre</strong> sowie für <strong>mehrfachbehinderte Patient:innen</strong>, die sich nicht äußern können. Bewertet Weinen, Mimik, Rumpfhaltung, Beinhaltung und motorische Unruhe. Beobachtungsdauer <strong>15 Sekunden</strong>. <strong>Für jede Variable nur eine Aussage zulässig.</strong> <strong>Cut-off bei 4</strong> — ab vier Punkten muss eine Schmerztherapie eingeleitet werden, mit steigender Punktzahl steigt die Dringlichkeit.',
+      source: 'Büttner W, Finke W. <em>Analysis of behavioural and physiological parameters for the assessment of postoperative analgesic demand in newborns, infants and young children.</em> Paediatr Anaesth. 2000;10(3):303–318. Empfohlen in der S3-Leitlinie der DGAI (AWMF-Reg.-Nr. 001-025). — Wiedergabe im Probieren-Modus zu didaktischen Zwecken; für die Pflegedokumentation den Originalbogen verwenden.' }
+  ];
+
+  // Allgemeiner Lerninhalt: Cut-off-Prinzip (wird im Lern-Modus oben angezeigt)
+  const SKALEN_INTRO = '<strong>Cut-off-Punkt:</strong> Manche Skalen haben einen festen Schwellenwert — <strong>die Punktzahl, ab der eine Schmerztherapie eingeleitet werden muss</strong>. Bei der KUSS liegt er bei 4 Punkten (klare Therapieschwelle). Bei der FPS-R sind 4 Punkte ein Hinweis auf mittelstarken Schmerz, aber keine harte Therapieschwelle. Der Cut-off ist die pflegerische Handlungsschwelle: darunter beobachten, darüber handeln bzw. Arzt informieren.';
+
+  // Skalen-Test-Cases
+  const SKALEN_CASES = [
+    { text: '<strong>Herr Klaus, 70 J.</strong>, nach Hüft-Endoprothese. Klar orientiert, deutsch sprechend, kann zählen.', expected: ['NRS'], also: ['VAS', 'VRS'], explain: '<strong>NRS</strong> ist Standard für orientierte Erwachsene. VAS und VRS wären auch möglich, NRS am gebräuchlichsten zur Verlaufsdokumentation.' },
+    { text: '<strong>Lara, 4 J.</strong>, nach Mandel-OP. Kann sprechen, ist wach und ansprechbar.', expected: ['FPS'], also: [], explain: '<strong>FPS-R (Smiley)</strong> ist ab 4 Jahren validiert und hier Standard. KUSS wäre noch möglich (Fremdbeobachtung), NRS überfordert ein 4-jähriges Kind kognitiv.' },
+    { text: '<strong>Frau Müller, 84 J.</strong>, fortgeschrittene Demenz. Kommuniziert kaum noch verbal, antwortet nicht auf Fragen.', expected: ['BESD'], also: [], explain: '<strong>BESD</strong> ist die Fremdbeobachtungs-Skala für Demenz, wenn keine Selbstauskunft möglich ist. NRS oder VRS scheiden aus, weil keine verbale Antwort kommt.' },
+    { text: '<strong>Frau Aslan, 32 J.</strong>, türkische Muttersprache, kein Deutsch. Vollständig orientiert.', expected: ['VAS', 'FPS'], also: [], explain: '<strong>VAS</strong> ist sprachunabhängig (Linie ohne Zahlen). <strong>Smiley</strong> funktioniert auch über Sprachbarrieren. NRS scheitert oft an Sprache und Zahlenverständnis ohne Übersetzung.' },
+    { text: '<strong>6 Wochen alter Säugling</strong>, postoperativ nach Leistenhernien-OP.', expected: ['KUSS'], also: [], explain: '<strong>KUSS</strong> ist die Standard-Beobachtungsskala für Säuglinge und Kleinkinder bis 4 Jahre.' },
+    { text: '<strong>Herr Schmidt, 60 J.</strong>, nach Hirninfarkt mit globaler Aphasie. Kann nicht mehr sprechen, versteht aber teilweise.', expected: ['BESD'], also: [], explain: '<strong>BESD</strong> — bei schwerer Aphasie funktioniert weder verbale noch numerische Selbstauskunft. Beobachtung von Mimik und Körpersprache ist die Methode der Wahl.' },
+    { text: '<strong>Tim, 11 J.</strong>, nach Blinddarm-OP. Klar, kann zählen, will gerne mitmachen.', expected: ['NRS', 'FPS'], also: [], explain: 'In diesem Alter funktioniert beides: <strong>NRS</strong> wenn das Kind sicher mit Zahlen ist, <strong>Smiley</strong> als visuelle Alternative. Frage das Kind selbst, was es lieber benutzt.' },
+    { text: '<strong>Herr Bauer, 86 J.</strong>, schwere Demenz im Pflegeheim, postoperativ nach Schenkelhalsfraktur. Reagiert nur noch auf Berührung und einfache Reize.', expected: ['BESD'], also: [], explain: '<strong>BESD</strong> ist genau für diese Konstellation entwickelt: schwere Demenz, keine verbale Selbstauskunft mehr möglich, Beobachtung von Atmung, Mimik, Körpersprache und Reaktion auf Trost. <em>Hinweis:</em> Auf Intensivstationen mit beatmeten Patient:innen kommen stattdessen Spezialskalen wie <strong>BPS</strong> oder <strong>CPOT</strong> zum Einsatz — die sind für diese Population validiert.' },
+    { text: '<strong>Frau Becker, 50 J.</strong>, chronische Rückenschmerzen, kognitiv und sprachlich unauffällig.', expected: ['NRS'], also: ['VAS', 'VRS'], explain: '<strong>NRS</strong> bei chronischen Schmerzen ideal für die Verlaufsdokumentation — vergleichbare Werte über Wochen und Monate.' },
+    { text: '<strong>Mia, 3 J.</strong>, nach Bauch-OP. Kann sprechen, ist aber gestresst.', expected: ['KUSS'], also: ['FPS'], explain: '<strong>KUSS</strong> ist hier die sichere Wahl: validiert für Kinder bis 4 J., Fremdbeobachtung umgeht das Stress-Problem. <strong>FPS-R</strong> ist eigentlich erst ab 4 Jahren validiert (Hicks 2001), wird in der Praxis aber gelegentlich auch ab 3 versucht — als Ergänzung möglich.' },
+    { text: '<strong>Frau Wagner, 92 J.</strong>, moderate Demenz. Antwortet noch in einzelnen Wörtern, versteht einfache Fragen.', expected: ['VRS', 'FPS'], also: [], explain: 'Bei moderater Demenz funktioniert oft noch eine <strong>verbale Skala (VRS)</strong> mit „leicht/mittel/stark" oder <strong>Smiley</strong> als visuelle Hilfe. NRS ist meist zu abstrakt.' },
+    { text: '<strong>Herr Lange, 75 J.</strong>, schwerst sehbehindert, hört aber gut. Kognitiv unauffällig.', expected: ['NRS', 'VRS'], also: [], explain: 'Visuelle Skalen (VAS, Smiley) scheiden aus. <strong>NRS verbal</strong> („auf einer Skala 0 bis 10…") oder <strong>VRS</strong> mit Wortabstufungen funktionieren akustisch.' }
+  ];
+
+  // Modul 2: ANAMNESE OPQRST
+  const OPQRST_INFO = [
+    { abbr: 'O', name: 'Onset',
+      tag: 'Beginn',
+      text: 'Wann hat der Schmerz begonnen? <strong>Plötzlich</strong> oder <strong>allmählich</strong>? Bei welcher Tätigkeit? Beispielfrage: „Wann hat der Schmerz angefangen, und was hast du gerade gemacht?"' },
+    { abbr: 'P', name: 'Provocation / Palliation',
+      tag: 'Auslöser & Linderung',
+      text: 'Was <strong>verstärkt</strong> den Schmerz? Was <strong>lindert</strong> ihn? Bewegung, Ruhe, Wärme, Kälte, bestimmte Positionen, Medikamente? Beispielfrage: „Wodurch wird es schlimmer, wodurch besser?"' },
+    { abbr: 'Q', name: 'Quality',
+      tag: 'Schmerzcharakter',
+      text: 'Wie <strong>fühlt sich</strong> der Schmerz an? Stechend, brennend, drückend, krampfartig, dumpf, ziehend, pulsierend? Beispielfrage: „Können Sie den Schmerz beschreiben — wie fühlt er sich an?"' },
+    { abbr: 'R', name: 'Region / Radiation',
+      tag: 'Lokalisation & Ausstrahlung',
+      text: 'Wo genau ist der Schmerz? <strong>Strahlt er aus</strong>? Beispielfrage: „Zeigen Sie mir die Stelle, wo es am schlimmsten ist. Strahlt der Schmerz irgendwohin?"' },
+    { abbr: 'S', name: 'Severity',
+      tag: 'Stärke',
+      text: 'Wie <strong>stark</strong> ist der Schmerz? Bewertung mit der gewählten Skala (NRS, VRS, Smiley etc.). Beispielfrage: „Auf einer Skala von 0 bis 10 — wo liegen Sie?"' },
+    { abbr: 'T', name: 'Time / Timing',
+      tag: 'Zeitlicher Verlauf',
+      text: 'Wie <strong>lange</strong> dauert der Schmerz? <strong>Konstant</strong> oder <strong>wechselnd</strong>? Tageszeit-abhängig? Beispielfrage: „Ist es ein Dauerschmerz oder kommt er in Wellen? Schlimmer am Morgen oder abends?"' }
+  ];
+
+  // OPQRST-Test: Patientenaussagen → richtiger Buchstabe
+  const OPQRST_CASES = [
+    { text: '„<em>Seit gestern Abend habe ich diese Bauchschmerzen.</em>"', expected: 'O', explain: '<strong>O — Onset.</strong> Die Aussage beschreibt, wann der Schmerz angefangen hat.' },
+    { text: '„<em>Es fühlt sich krampfartig an, in Wellen.</em>"', expected: 'Q', explain: '<strong>Q — Quality.</strong> „Krampfartig" beschreibt den Schmerzcharakter (Qualität).' },
+    { text: '„<em>Auf der Skala etwa eine 7 von 10.</em>"', expected: 'S', explain: '<strong>S — Severity.</strong> Eine Zahl auf der NRS gibt die Schmerzstärke an.' },
+    { text: '„<em>Hauptsächlich um den Bauchnabel herum.</em>"', expected: 'R', explain: '<strong>R — Region.</strong> Die Aussage gibt die Lokalisation des Schmerzes an.' },
+    { text: '„<em>Wärme hilft, aber kalte Speisen verschlimmern es.</em>"', expected: 'P', explain: '<strong>P — Provocation/Palliation.</strong> Faktoren, die den Schmerz beeinflussen (lindern oder verstärken).' },
+    { text: '„<em>Es kommt in Wellen, alle 5 bis 10 Minuten.</em>"', expected: 'T', explain: '<strong>T — Time/Timing.</strong> Beschreibt den zeitlichen Verlauf — wellenförmig in Intervallen.' },
+    { text: '„<em>Vor einer Stunde plötzlich angefangen.</em>"', expected: 'O', explain: '<strong>O — Onset.</strong> Beginn des Schmerzes (vor einer Stunde) und Charakter (plötzlich).' },
+    { text: '„<em>Drückend, wie ein Stein auf der Brust.</em>"', expected: 'Q', explain: '<strong>Q — Quality.</strong> Beschreibung des Schmerzcharakters (drückend).' },
+    { text: '„<em>Strahlt in den linken Arm aus.</em>"', expected: 'R', explain: '<strong>R — Radiation.</strong> Ausstrahlung in eine andere Körperregion.' },
+    { text: '„<em>Bei jeder Anstrengung wird es schlimmer.</em>"', expected: 'P', explain: '<strong>P — Provocation.</strong> Belastung als verstärkender Faktor.' },
+    { text: '„<em>Der Schmerz ist konstant, geht nicht weg.</em>"', expected: 'T', explain: '<strong>T — Time.</strong> Beschreibt den Verlauf — konstant statt wellenförmig.' },
+    { text: '„<em>8 von 10 — kaum auszuhalten.</em>"', expected: 'S', explain: '<strong>S — Severity.</strong> Numerische Angabe der Schmerzstärke.' }
+  ];
+
+  // Modul 3: WHO-STUFENSCHEMA
+  const WHO_INFO = [
+    { abbr: '1', name: 'Stufe 1 — Nicht-Opioid-Analgetika',
+      tag: 'leichter bis mittlerer Schmerz',
+      text: '<strong>Paracetamol, Ibuprofen, Diclofenac, Metamizol, ASS</strong> — bei leichten bis mittleren Schmerzen. Vorteil: gut verträglich, keine Abhängigkeit. Nachteil: Maximaldosis begrenzt, NSAR können Magen, Niere, Herz belasten.' },
+    { abbr: '2', name: 'Stufe 2 — Schwache Opioide + Nicht-Opioid',
+      tag: 'mittlerer bis starker Schmerz',
+      text: '<strong>Tramadol, Tilidin/Naloxon</strong> kombiniert mit einem Stufe-1-Wirkstoff. Bei mittelstarken Schmerzen oder wenn Stufe 1 nicht ausreicht. Das Nicht-Opioid wird beibehalten — die Wirkungen ergänzen sich.' },
+    { abbr: '3', name: 'Stufe 3 — Starke Opioide + Nicht-Opioid',
+      tag: 'starker bis stärkster Schmerz',
+      text: '<strong>Morphin, Oxycodon, Hydromorphon, Fentanyl, Buprenorphin</strong> kombiniert mit einem Stufe-1-Wirkstoff. Bei starken bis stärksten Schmerzen oder Tumorschmerz. BTM-pflichtig, Atemdepression beachten.' },
+    { abbr: 'A', name: 'Adjuvanzien (alle Stufen)',
+      tag: 'spezielle Schmerzformen',
+      text: '<strong>Antikonvulsiva</strong> (Pregabalin, Gabapentin) bei neuropathischem Schmerz. <strong>Antidepressiva</strong> (Amitriptylin, Duloxetin) bei chronischem Schmerz. <strong>Kortikosteroide</strong> (Dexamethason) bei tumorbedingten Schmerzen. Werden zusätzlich zu jeder Stufe eingesetzt.' }
+  ];
+
+  const WHO_CASES = [
+    { text: '<strong>Junge Frau</strong> mit gelegentlichen, leichten Spannungskopfschmerzen.', expected: '1', explain: '<strong>Stufe 1</strong> — leichte Schmerzen sind die Domäne von Nicht-Opioiden (Paracetamol, Ibuprofen).' },
+    { text: '<strong>Tumorpatient</strong> mit anhaltenden, mittelstarken Schmerzen trotz dauerhafter Paracetamol-Gabe.', expected: '2', explain: '<strong>Stufe 2</strong> — wenn Stufe 1 ausgeschöpft ist und der Schmerz weiter besteht, wird auf schwache Opioide (Tramadol) eskaliert. Das Paracetamol wird beibehalten.' },
+    { text: '<strong>Tumorpatient</strong> mit Knochenmetastasen, starke Schmerzen trotz Tramadol-Höchstdosis.', expected: '3', explain: '<strong>Stufe 3</strong> — starkes Opioid (Morphin, Fentanyl) ist hier indiziert. Das Nicht-Opioid bleibt zur Basis-Analgesie.' },
+    { text: 'Patient mit <strong>brennenden, kribbelnden Schmerzen</strong> nach Gürtelrose, mittelstarke Intensität.', expected: 'A', explain: '<strong>Adjuvans!</strong> Brennend-kribbelnde Schmerzen sind neuropathisch — hier wirkt ein <strong>Antikonvulsivum</strong> (Pregabalin/Gabapentin) gezielter als ein klassisches Analgetikum. Kombinierbar mit Stufe 1.' },
+    { text: '<strong>Postoperativ</strong> nach großer Bauch-OP, akut sehr starke Schmerzen.', expected: '3', explain: '<strong>Stufe 3</strong> — bei akut starken Schmerzen ist der Direkteinstieg auf starke Opioide (z. B. PCA-Pumpe mit Piritramid oder Morphin) gerechtfertigt. Stufenweise hochtitrieren wäre hier nicht sinnvoll.' },
+    { text: '<strong>Akuter Migräneanfall</strong> mit starken Kopfschmerzen, Photophobie, Übelkeit.', expected: '1', explain: '<strong>Stufe 1</strong> — Migräne wird primär mit Nicht-Opioiden (ASS, Ibuprofen) oder Migräne-spezifisch mit Triptanen behandelt. Opioide sind bei Migräne nicht indiziert (Risiko Medikamentenkopfschmerz).' },
+    { text: 'Patientin nach <strong>Knie-OP</strong>, leichte bis mittelstarke Schmerzen, hat schon Ibuprofen erhalten.', expected: '2', explain: '<strong>Stufe 2</strong> — wenn Stufe 1 nicht ausreicht, ergänzt ein schwaches Opioid (Tramadol). Die Stufen werden bei Bedarf eskaliert, nicht ersetzt.' },
+    { text: '<strong>Älterer Mann</strong> mit chronischen, mittelstarken Rückenschmerzen, Nieren­insuffizienz.', expected: '1', explain: '<strong>Stufe 1</strong> — aber Vorsicht bei NSAR wegen Niereninsuffizienz. Hier wäre Paracetamol oder Metamizol die bessere Wahl. Bei Nichtansprechen Stufe 2.' },
+    { text: 'Patientin mit <strong>diabetischer Polyneuropathie</strong>, brennende Fußschmerzen, deutlich beeinträchtigend.', expected: 'A', explain: '<strong>Adjuvans</strong> erforderlich — neuropathischer Schmerz spricht oft schlecht auf klassische Analgetika an. Erstwahl: Pregabalin oder Duloxetin (Antidepressivum).' },
+    { text: '<strong>Hospizpatient</strong> mit Tumorschmerzen, akute Knochenschmerz-Krise mit starken Schmerzen.', expected: '3', explain: '<strong>Stufe 3</strong> — in der Palliativversorgung wird bei stärkeren Tumorschmerzen direkt mit starkem Opioid begonnen, oft kombiniert mit Adjuvans (Bisphosphonate, Kortikoide).' }
+  ];
+
+  // ===== State =====
+  let activeMod = 'skalen';
+  let activeMode = 'learn';
+  let quizCurrent = 0;
+  let quizSelected = []; // Multi-Select für Skalen, Single für Anamnese/WHO
+  let quizSubmitted = false;
+  let quizScore = 0;
+
+  // ===== Module-Tabs =====
+  document.querySelectorAll('#mod-tabs .mod-tab').forEach(b => {
+    b.addEventListener('click', () => {
+      activeMod = b.dataset.m;
+      document.querySelectorAll('#mod-tabs .mod-tab').forEach(t => t.classList.toggle('active', t === b));
+      updateModeToggleVisibility();
+      resetQuizState();
+      render();
+    });
+  });
+
+  // Helfer: Label im Trigger nachziehen
+  function syncModeLabel() {
+    const active = document.querySelector('#mode-menu button.active');
+    if (active) $('mode-label').textContent = active.textContent;
+  }
+
+  // Probieren-Eintrag nur bei Skalen-Modul; sonst auf Lernen zurückfallen
+  function updateModeToggleVisibility() {
+    document.querySelectorAll('#mode-menu button[data-only]').forEach(btn => {
+      const showFor = btn.dataset.only;
+      const visible = activeMod === showFor;
+      btn.style.display = visible ? '' : 'none';
+      if (!visible && activeMode === btn.dataset.mode) {
+        activeMode = 'learn';
+        document.querySelectorAll('#mode-menu button').forEach(t =>
+          t.classList.toggle('active', t.dataset.mode === 'learn'));
+        syncModeLabel();
+      }
+    });
+  }
+  updateModeToggleVisibility();
+  syncModeLabel();
+
+  // ===== Mode-Dropdown =====
+  const modeDropdown = $('mode-dropdown');
+  const modeTrigger  = $('mode-trigger');
+
+  modeTrigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = modeDropdown.classList.toggle('open');
+    modeTrigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  document.addEventListener('click', (e) => {
+    if (!modeDropdown.contains(e.target)) {
+      modeDropdown.classList.remove('open');
+      modeTrigger.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  document.querySelectorAll('#mode-menu button').forEach(b => {
+    b.addEventListener('click', () => {
+      activeMode = b.dataset.mode;
+      document.querySelectorAll('#mode-menu button').forEach(t => t.classList.toggle('active', t === b));
+      syncModeLabel();
+      modeDropdown.classList.remove('open');
+      modeTrigger.setAttribute('aria-expanded', 'false');
+      resetQuizState();
+      render();
+    });
+  });
+
+  function resetQuizState() {
+    quizCurrent = 0;
+    quizSelected = [];
+    quizSubmitted = false;
+    quizScore = 0;
+  }
+
+  function render() {
+    if (activeMode === 'learn') renderLearn();
+    else if (activeMode === 'try') renderTry();
+    else renderTest();
+  }
+
+  // ===== LERN-MODUS =====
+  function renderLearn() {
+    let items;
+    if (activeMod === 'skalen') items = SKALEN_INFO;
+    else if (activeMod === 'anamnese') items = OPQRST_INFO;
+    else items = WHO_INFO;
+
+    const intro = (activeMod === 'skalen')
+      ? `<div class="item-card-note" style="margin:0 0 10px;">${SKALEN_INTRO}</div>`
+      : '';
+
+    $('content').innerHTML = `
+      ${intro}
+      <div class="items-list">
+        ${items.map(item => `
+          <div class="item-card">
+            <div class="item-card-head">
+              <span class="item-card-name">${item.abbr} · ${item.name}</span>
+              <span class="item-card-tag">${item.tag}</span>
+            </div>
+            <p class="item-card-text">${item.text}</p>
+            ${item.note ? `<div class="item-card-note">${item.note}</div>` : ''}
+            ${item.source ? `<p class="item-card-source">Quelle: ${item.source}</p>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  // ===== PROBIEREN-MODUS (nur Skalen) =====
+  function renderTry() {
+    $('content').innerHTML = `
+      <div class="items-list">
+        ${SKALEN_INFO.map(s => `
+          <div class="item-card" data-try="${s.abbr}">
+            <div class="item-card-head">
+              <span class="item-card-name">${s.abbr} · ${s.name}</span>
+              <span class="item-card-tag">${s.tag}</span>
+            </div>
+            <p class="item-card-text">${tryHint(s.abbr)}</p>
+            <div class="try-zone" data-zone="${s.abbr}"></div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    mountNRS();
+    mountVAS();
+    mountVRS();
+    mountFPS();
+    mountScore('BESD', BESD_ITEMS, besdInterp);
+    mountScore('KUSS', KUSS_ITEMS, kussInterp);
+  }
+
+  function tryHint(abbr) {
+    const hints = {
+      'NRS':  'Du fragst die Patient*in: <strong>„Auf einer Skala von 0 bis 10 — wo liegen Sie?"</strong> Tippe selbst eine Zahl an.',
+      'VAS':  'Vorderseite ohne Zahlen für die Patient*in, Rückseite mit Skala für die Pflegekraft. <strong>Schiebe den Punkt</strong> und sieh, was die Pflegekraft hinten abliest.',
+      'VRS':  'Du fragst: <strong>„Wie stark — kein, leicht, mittel, stark, unerträglich?"</strong> Wähle ein Wort.',
+      'FPS':  'Sechs Gesichter von lächelnd bis weinend. Frage nach <strong>Schmerz</strong>, nicht nach Stimmung. Tippe ein Gesicht.',
+      'BESD': 'Beobachtung 2 Min. in Ruhe oder bei Pflege. Bewerte jedes der 5 Items mit 0/1/2.',
+      'KUSS': 'Beobachte das Kind 15 Sek. — bewerte 5 Items mit 0/1/2. <strong>Ab 4 Punkten</strong> ist analgetische Therapie indiziert.'
+    };
+    return hints[abbr] || '';
+  }
+
+  // ---------- NRS ----------
+  function nrsColor(n) {
+    const colors = ['#cfeac0','#d3e8b8','#dfe7a8','#ece59a','#f0d588','#f3c075','#eea869','#e88f5d','#e07551','#d85a45','#cf3e3a'];
+    return colors[n];
+  }
+  function nrsInterp(n) {
+    if (n === 0) return 'Kein Schmerz — keine Intervention nötig.';
+    if (n <= 3) return 'Leichter Schmerz — Beobachtung, ggf. nicht-medikamentöse Maßnahmen.';
+    if (n <= 6) return 'Mäßiger Schmerz — Schmerztherapie indiziert, Arzt informieren.';
+    return 'Starker Schmerz — sofortige Reaktion, ärztliche Anordnung einholen.';
+  }
+  function mountNRS() {
+    const z = document.querySelector('[data-zone="NRS"]'); if (!z) return;
+    let buttons = '';
+    for (let i = 0; i <= 10; i++) {
+      buttons += `<button class="nrs-btn" data-v="${i}" type="button" style="background:${nrsColor(i)}">${i}</button>`;
+    }
+    z.innerHTML = `
+      <p class="try-prompt">Probieren</p>
+      <div class="nrs-row">${buttons}</div>
+      <div class="nrs-labels"><span>0 = kein</span><span>10 = stärkster</span></div>
+      <button class="try-reveal" data-reveal hidden type="button">Auswertung anzeigen</button>
+      <div class="result-mini" data-out hidden></div>
+      <button class="try-reset" data-reset hidden type="button">Zurücksetzen</button>
+    `;
+    let pendingValue = null;
+    const reveal = z.querySelector('[data-reveal]');
+    const out    = z.querySelector('[data-out]');
+    const reset  = z.querySelector('[data-reset]');
+    z.querySelectorAll('.nrs-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        z.querySelectorAll('.nrs-btn').forEach(x => x.classList.remove('selected'));
+        btn.classList.add('selected');
+        pendingValue = +btn.dataset.v;
+        reveal.hidden = false;
+        out.hidden = true;
+      });
+    });
+    reveal.addEventListener('click', () => {
+      if (pendingValue === null) return;
+      out.innerHTML = `<span class="rm-num">NRS ${pendingValue} / 10</span><span class="rm-text">${nrsInterp(pendingValue)}</span>`;
+      out.hidden = false;
+      reveal.hidden = true;
+      reset.hidden = false;
+    });
+    reset.addEventListener('click', () => {
+      z.querySelectorAll('.nrs-btn').forEach(x => x.classList.remove('selected'));
+      pendingValue = null;
+      out.hidden = true;
+      reveal.hidden = true;
+      reset.hidden = true;
+    });
+  }
+
+  // ---------- VAS ----------
+  function mountVAS() {
+    const z = document.querySelector('[data-zone="VAS"]'); if (!z) return;
+    z.innerHTML = `
+      <p class="try-prompt">Probieren</p>
+      <div class="vas-line"><div class="vas-thumb"></div></div>
+      <div class="vas-labels"><span>kein Schmerz</span><span>stärkster</span></div>
+      <button class="try-reveal" data-reveal hidden type="button">Auswertung anzeigen</button>
+      <div class="result-mini" data-out hidden style="margin-top:10px;"></div>
+      <button class="try-reset" data-reset hidden type="button">Zurücksetzen</button>
+    `;
+    const line   = z.querySelector('.vas-line');
+    const thumb  = z.querySelector('.vas-thumb');
+    const reveal = z.querySelector('[data-reveal]');
+    const out    = z.querySelector('[data-out]');
+    const reset  = z.querySelector('[data-reset]');
+    let dragging = false;
+    let pendingPct = null;
+    function pos(ev) {
+      const r = line.getBoundingClientRect();
+      const x = (ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left;
+      return Math.max(0, Math.min(1, x / r.width));
+    }
+    function update(p) {
+      thumb.style.left = (p * 100) + '%';
+      pendingPct = p;
+      reveal.hidden = false;
+      out.hidden = true;
+      reset.hidden = true;
+    }
+    function start(ev) { dragging = true; update(pos(ev)); ev.preventDefault(); }
+    function move(ev)  { if (!dragging) return; update(pos(ev)); ev.preventDefault(); }
+    function end()     { dragging = false; }
+    thumb.addEventListener('mousedown', start);
+    line.addEventListener('mousedown', start);
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', end);
+    thumb.addEventListener('touchstart', start, { passive: false });
+    line.addEventListener('touchstart', start, { passive: false });
+    window.addEventListener('touchmove', move, { passive: false });
+    window.addEventListener('touchend', end);
+
+    reveal.addEventListener('click', () => {
+      if (pendingPct === null) return;
+      const cm = (pendingPct * 10).toFixed(1).replace('.', ',');
+      const eq = Math.round(pendingPct * 10);
+      out.innerHTML = `<span class="rm-num">${cm} cm ≈ NRS ${eq}</span><span class="rm-text">${nrsInterp(eq)}</span>`;
+      out.hidden = false;
+      reveal.hidden = true;
+      reset.hidden = false;
+    });
+    reset.addEventListener('click', () => {
+      thumb.style.left = '50%';
+      pendingPct = null;
+      out.hidden = true;
+      reveal.hidden = true;
+      reset.hidden = true;
+    });
+  }
+
+  // ---------- VRS ----------
+  function mountVRS() {
+    const z = document.querySelector('[data-zone="VRS"]'); if (!z) return;
+    const items = [
+      ['kein Schmerz', 0],
+      ['leicht',       2],
+      ['mittel',       5],
+      ['stark',        8],
+      ['unerträglich',10]
+    ];
+    z.innerHTML = `
+      <p class="try-prompt">Probieren</p>
+      <div class="vrs-stack">
+        ${items.map(([w, v]) => `
+          <button class="vrs-btn" data-v="${v}" data-w="${w}" type="button">
+            <span>${w}</span>
+          </button>
+        `).join('')}
+      </div>
+      <button class="try-reveal" data-reveal hidden type="button">Auswertung anzeigen</button>
+      <div class="result-mini" data-out hidden></div>
+      <button class="try-reset" data-reset hidden type="button">Zurücksetzen</button>
+    `;
+    let pending = null;
+    const reveal = z.querySelector('[data-reveal]');
+    const out    = z.querySelector('[data-out]');
+    const reset  = z.querySelector('[data-reset]');
+    z.querySelectorAll('.vrs-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        z.querySelectorAll('.vrs-btn').forEach(x => x.classList.remove('selected'));
+        btn.classList.add('selected');
+        pending = { v: +btn.dataset.v, w: btn.dataset.w };
+        reveal.hidden = false;
+        out.hidden = true;
+        reset.hidden = true;
+      });
+    });
+    reveal.addEventListener('click', () => {
+      if (!pending) return;
+      out.innerHTML = `<span class="rm-num">„${pending.w}"</span><span class="rm-text">${nrsInterp(pending.v)}</span>`;
+      out.hidden = false;
+      reveal.hidden = true;
+      reset.hidden = false;
+    });
+    reset.addEventListener('click', () => {
+      z.querySelectorAll('.vrs-btn').forEach(x => x.classList.remove('selected'));
+      pending = null;
+      out.hidden = true;
+      reveal.hidden = true;
+      reset.hidden = true;
+    });
+  }
+
+  // ---------- Smiley / FPS ----------
+  function smileySVG(idx) {
+    const faces = [
+      { brow: 'M 20 32 Q 26 28 32 32  M 40 32 Q 46 28 52 32', mouth: 'M 22 50 Q 36 60 50 50', tear: '' },
+      { brow: 'M 20 32 Q 26 30 32 32  M 40 32 Q 46 30 52 32', mouth: 'M 22 52 Q 36 56 50 52', tear: '' },
+      { brow: 'M 20 32 L 32 32  M 40 32 L 52 32',             mouth: 'M 22 52 L 50 52', tear: '' },
+      { brow: 'M 20 30 L 30 34  M 42 34 L 52 30',             mouth: 'M 24 56 Q 36 50 48 56', tear: '' },
+      { brow: 'M 20 28 L 32 34  M 40 34 L 52 28',             mouth: 'M 22 56 Q 36 46 50 56', tear: '' },
+      { brow: 'M 18 28 L 32 36  M 40 36 L 54 28',             mouth: 'M 22 58 Q 36 44 50 58', tear: 'M 24 40 Q 22 46 26 48 Q 28 46 26 40 Z' }
+    ];
+    const yellows = ['#ffe17a','#ffe17a','#fed873','#fcc365','#f3a655','#e88a48'];
+    const f = faces[idx];
+    return `<svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="36" cy="36" r="30" fill="${yellows[idx]}" stroke="#7a5a14" stroke-width="2"/>
+      <path d="${f.brow}" stroke="#3a2a08" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="${f.mouth}" stroke="#3a2a08" stroke-width="3" fill="none" stroke-linecap="round"/>
+      ${f.tear ? `<path d="${f.tear}" fill="#4ea3e6"/>` : ''}
+    </svg>`;
+  }
+  function mountFPS() {
+    const z = document.querySelector('[data-zone="FPS"]'); if (!z) return;
+    const vals = [0, 2, 4, 6, 8, 10];
+    const interps = [
+      'Kein Schmerz — Kind wirkt entspannt.',
+      'Sehr leicht — eventuell unangenehm, gut tolerierbar.',
+      'Leicht bis mäßig — Beobachtung, Ablenkung versuchen.',
+      'Mäßig — analgetische Therapie sollte angeboten werden.',
+      'Stark — sofortige analgetische Therapie indiziert.',
+      'Schlimmster vorstellbarer Schmerz — sofort handeln.'
+    ];
+    let row = '';
+    for (let i = 0; i < 6; i++) {
+      row += `<button class="smiley-btn" data-i="${i}" type="button">${smileySVG(i)}</button>`;
+    }
+    z.innerHTML = `
+      <p class="try-prompt">Probieren</p>
+      <div class="smiley-row">${row}</div>
+      <div class="nrs-labels"><span>kein</span><span>schlimmster</span></div>
+      <button class="try-reveal" data-reveal hidden type="button">Auswertung anzeigen</button>
+      <div class="result-mini" data-out hidden style="margin-top:10px;"></div>
+      <button class="try-reset" data-reset hidden type="button">Zurücksetzen</button>
+    `;
+    let pending = null;
+    const reveal = z.querySelector('[data-reveal]');
+    const out    = z.querySelector('[data-out]');
+    const reset  = z.querySelector('[data-reset]');
+    z.querySelectorAll('.smiley-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        z.querySelectorAll('.smiley-btn').forEach(x => x.classList.remove('selected'));
+        btn.classList.add('selected');
+        pending = +btn.dataset.i;
+        reveal.hidden = false;
+        out.hidden = true;
+        reset.hidden = true;
+      });
+    });
+    reveal.addEventListener('click', () => {
+      if (pending === null) return;
+      out.innerHTML = `<span class="rm-num">Gesicht ${pending + 1} (≈ NRS ${vals[pending]})</span><span class="rm-text">${interps[pending]}</span>`;
+      out.hidden = false;
+      reveal.hidden = true;
+      reset.hidden = false;
+    });
+    reset.addEventListener('click', () => {
+      z.querySelectorAll('.smiley-btn').forEach(x => x.classList.remove('selected'));
+      pending = null;
+      out.hidden = true;
+      reveal.hidden = true;
+      reset.hidden = true;
+    });
+  }
+
+  // ---------- BESD / KUSS ----------
+  const BESD_ITEMS = [
+    { title: 'Atmung (unabhängig von Lautäußerungen)', opts: [
+      'Normal',
+      'Gelegentlich angestrengt, kurze Hyperventilation',
+      'Lautstark angestrengt, lange Hyperventilation, Cheyne-Stokes-Atmung'
+    ]},
+    { title: 'Negative Lautäußerungen', opts: [
+      'Keine',
+      'Gelegentliches Stöhnen oder Ächzen, leise negativ',
+      'Wiederholtes beunruhigtes Rufen, lautes Stöhnen, Weinen'
+    ]},
+    { title: 'Gesichtsausdruck', opts: [
+      'Lächelnd oder nichtssagend',
+      'Traurig, ängstlich, sorgenvoller Blick',
+      'Grimassieren'
+    ]},
+    { title: 'Körpersprache', opts: [
+      'Entspannt',
+      'Angespannt, nervöses Hin- und Hergehen, Nesteln',
+      'Starr, geballte Fäuste, angezogene Knie, Wegstoßen, Schlagen'
+    ]},
+    { title: 'Trost', opts: [
+      'Trösten nicht notwendig',
+      'Ablenken oder Beruhigen durch Stimme/Berührung möglich',
+      'Trösten, Ablenken, Beruhigen nicht möglich'
+    ]}
+  ];
+  const KUSS_ITEMS = [
+    { title: 'Weinen', opts: ['Gar nicht', 'Stöhnen, Jammern, Wimmern', 'Schreien'] },
+    { title: 'Gesichtsausdruck', opts: ['Entspannt, lächelt', 'Mund verzerrt', 'Mund und Augen grimassieren'] },
+    { title: 'Rumpfhaltung', opts: ['Neutral', 'Unstet', 'Aufbäumen, Krümmen'] },
+    { title: 'Beinhaltung', opts: ['Neutral, frei beweglich', 'Strampelnd, tretend', 'An den Körper gezogen'] },
+    { title: 'Motorische Unruhe', opts: ['Nicht vorhanden', 'Mäßig', 'Ruhelos'] }
+  ];
+  function besdInterp(s, count, total) {
+    if (count < total) return `Noch ${total - count} von ${total} Items unbewertet.`;
+    if (s <= 1) return 'Vermutlich kein Schmerz.';
+    if (s <= 3) return 'Hinweis auf leichten Schmerz — Ursache abklären, Komfortmaßnahmen.';
+    if (s <= 6) return 'Mittlerer Schmerz — Schmerztherapie indiziert (Arzt informieren).';
+    return 'Starker Schmerz — sofortige Reaktion, ärztliche Anordnung einholen.';
+  }
+  function kussInterp(s, count, total) {
+    if (count < total) return `Noch ${total - count} von ${total} Items unbewertet.`;
+    if (s < 4) return 'Keine analgetische Therapie indiziert — weiterhin beobachten.';
+    if (s <= 6) return 'Schmerzhinweis — analgetische Therapie indiziert (≥ 4 Punkte = Therapieschwelle).';
+    return 'Starker Schmerz — dringende analgetische Therapie indiziert.';
+  }
+  function mountScore(abbr, items, interpFn) {
+    const z = document.querySelector(`[data-zone="${abbr}"]`); if (!z) return;
+    const itemsHTML = items.map((it, i) => `
+      <div class="score-item" data-i="${i}">
+        <h4>${i + 1}. ${it.title}</h4>
+        <div class="score-options">
+          ${it.opts.map((o, j) => `
+            <button class="score-opt" data-pts="${j}" type="button">
+              <span class="pts">${j}</span>
+              <span class="label">${o}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+    z.innerHTML = `
+      <p class="try-prompt">Probieren — Bewertungsbogen</p>
+      ${itemsHTML}
+      <button class="try-reveal" data-reveal hidden type="button">Auswertung anzeigen</button>
+      <div class="result-mini" data-out hidden style="margin-top:14px;"></div>
+      <button class="try-reset" data-reset type="button">Bewertung zurücksetzen</button>
+    `;
+    const reveal = z.querySelector('[data-reveal]');
+    const out    = z.querySelector('[data-out]');
+    function getScore() {
+      let sum = 0, count = 0;
+      const total = z.querySelectorAll('.score-item').length;
+      z.querySelectorAll('.score-item').forEach(item => {
+        const sel = item.querySelector('.score-opt.selected');
+        if (sel) { sum += +sel.dataset.pts; count++; }
+      });
+      return { sum, count, total };
+    }
+    function showRevealIfReady() {
+      const { count, total } = getScore();
+      reveal.hidden = !(count === total && count > 0);
+      reveal.disabled = !(count === total);
+      reveal.textContent = (count < total)
+        ? `Noch ${total - count} von ${total} Items bewerten`
+        : 'Auswertung anzeigen';
+      // Solange noch nicht alle bewertet sind, ggf. den Button als Hinweis sichtbar machen
+      if (count > 0 && count < total) {
+        reveal.hidden = false;
+      }
+      out.hidden = true;
+    }
+    z.querySelectorAll('.score-opt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.closest('.score-item');
+        item.querySelectorAll('.score-opt').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        showRevealIfReady();
+      });
+    });
+    reveal.addEventListener('click', () => {
+      const { sum, count, total } = getScore();
+      if (count !== total) return;
+      out.innerHTML = `<span class="rm-num">${abbr}-Score: ${sum} / 10</span><span class="rm-text">${interpFn(sum, count, total)}</span>`;
+      out.hidden = false;
+      reveal.hidden = true;
+    });
+    z.querySelector('[data-reset]').addEventListener('click', () => {
+      z.querySelectorAll('.score-opt.selected').forEach(b => b.classList.remove('selected'));
+      out.hidden = true;
+      reveal.hidden = true;
+    });
+  }
+
+  // ===== TEST-MODUS =====
+  function renderTest() {
+    let cases;
+    if (activeMod === 'skalen') cases = SKALEN_CASES;
+    else if (activeMod === 'anamnese') cases = OPQRST_CASES;
+    else cases = WHO_CASES;
+
+    if (quizCurrent >= cases.length) {
+      renderEnd(cases.length);
+      return;
+    }
+
+    const sz = cases[quizCurrent];
+
+    let optionsHTML;
+    let optionsClass;
+    let multi = false;
+
+    if (activeMod === 'skalen') {
+      multi = true;
+      optionsClass = 'options';
+      optionsHTML = SKALEN_INFO.map(s => `
+        <button class="opt-btn" data-key="${s.abbr}" type="button">
+          <span class="opt-abbr">${s.abbr}</span>
+          <span class="opt-name">${s.short || s.name}</span>
+        </button>
+      `).join('');
+    } else if (activeMod === 'anamnese') {
+      optionsClass = 'options six';
+      optionsHTML = OPQRST_INFO.map(o => `
+        <button class="opt-btn" data-key="${o.abbr}" type="button" style="justify-content:center;">
+          <span class="opt-abbr">${o.abbr}</span>
+          <span class="opt-name">${o.name}</span>
+        </button>
+      `).join('');
+    } else {
+      optionsClass = 'options three';
+      optionsHTML = WHO_INFO.map(w => `
+        <button class="opt-btn" data-key="${w.abbr}" type="button">
+          <span class="opt-abbr">${w.abbr}</span>
+          <span class="opt-name">${w.name.split(' — ')[0]}</span>
+        </button>
+      `).join('');
+    }
+
+    const questionText = activeMod === 'skalen' ? 'Welche Skala (oder Skalen) passen?'
+                       : activeMod === 'anamnese' ? 'Welcher OPQRST-Buchstabe?'
+                       : 'Welche Stufe oder welches Adjuvans?';
+
+    $('content').innerHTML = `
+      <div class="quiz-card">
+        <div>
+          <div class="quiz-meta">
+            <span>Frage <strong>${quizCurrent + 1}</strong> / <strong>${cases.length}</strong></span>
+            <span class="quiz-points"><strong>${quizScore}</strong> Punkte</span>
+          </div>
+          <div class="quiz-bar"><div class="quiz-fill" style="width: ${(quizCurrent / cases.length * 100)}%"></div></div>
+        </div>
+        <p class="quiz-text">${sz.text}</p>
+        <p class="quiz-question">${questionText}</p>
+        <div class="${optionsClass}" id="quiz-options">${optionsHTML}</div>
+        <button class="submit-btn" id="quiz-submit" disabled>Antwort prüfen</button>
+        <div id="feedback-slot"></div>
+      </div>
+    `;
+
+    // Event-Listener
+    document.querySelectorAll('#quiz-options .opt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (quizSubmitted) return;
+        const key = btn.dataset.key;
+        if (multi) {
+          const idx = quizSelected.indexOf(key);
+          if (idx >= 0) {
+            quizSelected.splice(idx, 1);
+            btn.classList.remove('active');
+          } else {
+            quizSelected.push(key);
+            btn.classList.add('active');
+          }
+        } else {
+          document.querySelectorAll('#quiz-options .opt-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          quizSelected = [key];
+        }
+        $('quiz-submit').disabled = quizSelected.length === 0;
+      });
+    });
+
+    $('quiz-submit').addEventListener('click', () => {
+      if (quizSubmitted) {
+        quizCurrent++;
+        quizSelected = [];
+        quizSubmitted = false;
+        renderTest();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        submitAnswer(sz, multi);
+      }
+    });
+  }
+
+  function submitAnswer(sz, multi) {
+    quizSubmitted = true;
+
+    let correct;
+    if (multi) {
+      // Skalen: mind. eine Skala aus expected gewählt + keine, die nicht in expected ODER also vorkommt
+      const allowedSet = new Set([...sz.expected, ...sz.also]);
+      const hasCorrectExpected = sz.expected.some(e => quizSelected.includes(e));
+      const noWrongSelected = quizSelected.every(s => allowedSet.has(s));
+      correct = hasCorrectExpected && noWrongSelected;
+    } else {
+      correct = quizSelected[0] === sz.expected;
+    }
+
+    if (correct) quizScore++;
+
+    document.querySelectorAll('#quiz-options .opt-btn').forEach(btn => {
+      const key = btn.dataset.key;
+      btn.classList.remove('active');
+      if (multi) {
+        if (sz.expected.includes(key)) btn.classList.add('correct');
+        else if (sz.also && sz.also.includes(key)) btn.classList.add('also-correct');
+        else if (quizSelected.includes(key)) btn.classList.add('wrong');
+      } else {
+        if (key === sz.expected) btn.classList.add('correct');
+        else if (key === quizSelected[0]) btn.classList.add('wrong');
+      }
+    });
+
+    let alsoNote = '';
+    if (multi && sz.also && sz.also.length > 0) {
+      alsoNote = ` <em>Akzeptable Alternativen: ${sz.also.join(', ')}.</em>`;
+    }
+
+    $('feedback-slot').innerHTML = `<div class="quiz-feedback">${sz.explain}${alsoNote}</div>`;
+
+    const cases = activeMod === 'skalen' ? SKALEN_CASES : activeMod === 'anamnese' ? OPQRST_CASES : WHO_CASES;
+    const btn = $('quiz-submit');
+    btn.textContent = (quizCurrent < cases.length - 1) ? 'Nächste Frage →' : 'Auswertung anzeigen →';
+    btn.disabled = false;
+    $('quiz-options').querySelectorAll('.opt-btn').forEach(b => b.style.cursor = 'default');
+  }
+
+  function renderEnd(maxQuestions) {
+    const pct = Math.round((quizScore / maxQuestions) * 100);
+    let rating;
+    if (pct === 100) rating = 'Perfekt — alle Fälle korrekt zugeordnet';
+    else if (pct >= 80) rating = 'Sehr gut — die Logik sitzt';
+    else if (pct >= 60) rating = 'Gut — wiederhole im Lern-Modus';
+    else rating = 'Übung lohnt sich — schau die Lerninhalte nochmal durch';
+
+    $('content').innerHTML = `
+      <div class="end-card">
+        <div class="end-score">${quizScore} / ${maxQuestions}</div>
+        <div class="end-score-label">Punkte (${pct} %)</div>
+        <div class="end-rating">${rating}</div>
+        <button class="end-restart" id="end-restart">Test neu starten</button>
+      </div>
+    `;
+    $('end-restart').addEventListener('click', () => {
+      resetQuizState();
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
