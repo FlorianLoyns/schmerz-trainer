@@ -795,6 +795,7 @@ if ('serviceWorker' in navigator) {
   let quizSelected = []; // Multi-Select für Skalen, Single für Anamnese/WHO
   let quizSubmitted = false;
   let quizScore = 0;
+  let quizCases = null;
 
   // ===== Module-Tabs =====
   document.querySelectorAll('#mod-tabs .mod-tab').forEach(b => {
@@ -863,6 +864,7 @@ if ('serviceWorker' in navigator) {
     quizSelected = [];
     quizSubmitted = false;
     quizScore = 0;
+    quizCases = null;
   }
 
   function render() {
@@ -1297,6 +1299,9 @@ if ('serviceWorker' in navigator) {
     if (activeMod === 'skalen') cases = SKALEN_CASES;
     else if (activeMod === 'anamnese') cases = OPQRST_CASES;
     else cases = WHO_CASES;
+
+    if (!quizCases) quizCases = [...cases].sort(() => Math.random() - 0.5);
+    cases = quizCases;
 
     if (quizCurrent >= cases.length) {
       renderEnd(cases.length);
